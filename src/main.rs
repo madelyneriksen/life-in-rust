@@ -1,3 +1,4 @@
+use std::time::Instant;
 use conway::{Point, Game};
 
 fn main() {
@@ -7,6 +8,9 @@ fn main() {
         Point::new(8, 7),
     ];
     let mut game = Game::new(starter);
-    game.run_generation();
-    println!("{}", game.generation);
+    let instant = Instant::now();
+    for _ in 0..1000 {
+        game.run_generation();
+    }
+    println!("Ran {} generations in {}ms 🔥", game.generation, instant.elapsed().as_millis());
 }
