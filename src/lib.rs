@@ -2,12 +2,12 @@ use std::collections::HashSet;
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct Point {
-    x: usize,
-    y: usize,
+    x: isize,
+    y: isize,
 }
 
 impl Point {
-    pub fn new(x: usize, y: usize) -> Point {
+    pub fn new(x: isize, y: isize) -> Point {
         Point {
             x,
             y,
@@ -30,8 +30,8 @@ impl Point {
 }
 
 pub struct Game {
-    board: HashSet<Point>,
-    pub generation: usize,
+    pub board: HashSet<Point>,
+    pub generation: isize,
 }
 
 impl Game {
@@ -48,7 +48,7 @@ impl Game {
     /// Sums the amount of live cells in a given area.
     ///
     /// For calculating alive or dead cells.
-    pub fn sum_live(&self, points: Vec<Point>) -> usize {
+    pub fn sum_live(&self, points: Vec<Point>) -> isize {
         let mut total = 0;
         for point in points {
             if self.board.contains(&point) {
@@ -59,6 +59,37 @@ impl Game {
     }
     /// Runs one generation of the Game of Life.
     pub fn run_generation(&mut self) {
+        // All cells to reap at the end of the generation.
+        let mut deaths = vec![];
+
+        // All cells to create at the end of the generation.
+        let mut births = vec![];
+
+        // All cells to check this generation for births/deaths.
+        let mut checks = vec![];
+        for cell in &self.board {
+            checks.append(&mut cell.neighbors());
+        }
+
+        // Check all cells.
+        for cell in checks {
+            let total = self.sum_live(cell.neighbors());
+            let is_live = self.board.contains(&cell);
+            if total == 3 && !is_live {
+                births.push(cell);         
+            } else if total < 3 || total > 4 && is_live {
+                deaths.push(cell);
+            }
+        }
+
+        // Apply game state changes.
+        for cell in deaths {
+            &self.board.remove(&cell);
+        }
+        for cell in births {
+            &self.board.insert(cell);
+        }
+
         self.generation += 1;
     }
 }
@@ -110,5 +141,26 @@ mod tests {
         assert_eq!(game.generation, 0);
         game.run_generation();
         assert_eq!(game.generation, 1);
+    }
+
+    #[test]
+    fn game_generation_applies_deaths_births() {
+        // Tests the game on a common spinner.
+        let starter = vec![
+            Point::new(1, 0),
+            Point::new(1, 1),
+            Point::new(1, 2),
+        ];
+        let mut game = Game::new(starter);
+        game.run_generation();
+        assert!(game.board.contains(&Point::new(2, 1)));
+        assert!(game.board.contains(&Point::new(1, 1)));
+        assert!(game.board.contains(&Point::new(0, 1)));
+
+        // Spinners get back to where they start.
+        game.run_generation();
+        assert!(game.board.contains(&Point::new(1, 0)));
+        assert!(game.board.contains(&Point::new(1, 1)));
+        assert!(game.board.contains(&Point::new(1, 2)));
     }
 }
