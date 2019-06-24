@@ -86,6 +86,24 @@ mod tests {
     }
 
     #[test]
+    fn point_live_sum() {
+        let starter = vec![Point::new(1, 1)];
+        let neighbors = starter[0].neighbors();
+        let game = Game::new(starter);
+        let total = game.sum_live(neighbors);
+        assert_eq!(total, 1);
+
+        let starter = vec![
+            Point::new(1, 1),
+            Point::new(1, 2),
+        ];
+        let neighbors = starter[0].neighbors();
+        let game = Game::new(starter);
+        let total =  game.sum_live(neighbors);
+        assert_eq!(total, 2)
+    }
+
+    #[test]
     fn game_generation_increments() {
         let starter = vec![];
         let mut game = Game::new(starter);
