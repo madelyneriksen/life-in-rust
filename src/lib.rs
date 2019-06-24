@@ -8,10 +8,7 @@ pub struct Point {
 
 impl Point {
     pub fn new(x: isize, y: isize) -> Point {
-        Point {
-            x,
-            y,
-        }
+        Point { x, y }
     }
     /// Returns all neighboring points/cells.
     ///
@@ -76,7 +73,7 @@ impl Game {
             let total = self.sum_live(cell.neighbors());
             let is_live = self.board.contains(&cell);
             if total == 3 && !is_live {
-                births.push(cell);         
+                births.push(cell);
             } else if total < 3 || total > 4 && is_live {
                 deaths.push(cell);
             }
@@ -124,13 +121,10 @@ mod tests {
         let total = game.sum_live(neighbors);
         assert_eq!(total, 1);
 
-        let starter = vec![
-            Point::new(1, 1),
-            Point::new(1, 2),
-        ];
+        let starter = vec![Point::new(1, 1), Point::new(1, 2)];
         let neighbors = starter[0].neighbors();
         let game = Game::new(starter);
-        let total =  game.sum_live(neighbors);
+        let total = game.sum_live(neighbors);
         assert_eq!(total, 2)
     }
 
@@ -146,11 +140,7 @@ mod tests {
     #[test]
     fn game_generation_applies_deaths_births() {
         // Tests the game on a common spinner.
-        let starter = vec![
-            Point::new(1, 0),
-            Point::new(1, 1),
-            Point::new(1, 2),
-        ];
+        let starter = vec![Point::new(1, 0), Point::new(1, 1), Point::new(1, 2)];
         let mut game = Game::new(starter);
         game.run_generation();
         assert!(game.board.contains(&Point::new(2, 1)));
